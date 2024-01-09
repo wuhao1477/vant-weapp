@@ -6,6 +6,8 @@ const insert = require('gulp-insert');
 const rename = require('gulp-rename');
 const postcss = require('gulp-postcss');
 const ts = require('gulp-typescript');
+const terser = require('gulp-terser');
+const cleanCSS = require('gulp-clean-css');
 const util = require('util');
 const merge2 = require('merge2');
 const exec = util.promisify(require('child_process').exec);
@@ -35,6 +37,7 @@ const lessCompiler = (dist) =>
       .src(srcPath)
       .pipe(less())
       .pipe(postcss())
+      .pipe(cleanCSS()) // 压缩 CSS
       .pipe(
         insert.transform((contents, file) => {
           if (!file.path.includes('packages' + path.sep + 'common')) {
@@ -80,6 +83,7 @@ const tsCompiler = (dist, config) =>
             return contents;
           })
         )
+        .pipe(terser()) // 压缩 JavaScript
         .pipe(gulp.dest(dist)),
       tsResult.dts.pipe(gulp.dest(dist))
     );
